@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+
+  bash_base:
+    image: kdk411/darkmark:base
+    volumes: 
+      - $HOME/.Xauthority:/root/.Xauthority:rw
+      - /mnt:/mnt
+      # - YOUR_DATA_VOL:DESIRED_PLACE_YOUR_DATA_VOL_TO_BE_MOUNTED
+    environment:
+      - DISPLAY=$DISPLAY
+    network_mode: "host"
+    tty: true
+    stdin_open: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ['0']
+            capabilities: [gpu]
+    entrypoint: ["/bin/bash"]
+
+  bash_python:
+    image: kdk411/darkmark:prod
+    volumes: 
+      - $HOME/.Xauthority:/root/.Xauthority:rw
+      - /mnt:/mnt
+      # - ./tiff_to_png.py:/workspace/prod/
+    environment:
+      - DISPLAY=$DISPLAY
+    network_mode: "host"
+    tty: true
+    stdin_open: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ['0']
+            capabilities: [gpu]
+    entrypoint: ["/bin/bash"]
+
+  # infer:
+  #   image: darkmark:test
+  #   volumes: 
+  #     - $HOME/.Xauthority:/root/.Xauthority:rw
+  #   environment:
+  #     - DISPLAY=$DISPLAY
+  #   network_mode: "host"
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - driver: nvidia
+  #           device_ids: ["0"]
+  #           capabilities: [gpu]
+  #   command: [DarkHelp -j adz_imgs.cfg adz_imgs_final.weights adz_imgs.names /mnt/RND/R-N-D/Audit_Jeb_correct_xray/xray_only/galveston_xray_only/*.png 2>&1 | sed -e '1,/JSON OUTPUT/ d' > adz_prediction_galveston.json]
