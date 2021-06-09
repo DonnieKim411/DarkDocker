@@ -56,7 +56,7 @@ If you DO NOT want to make default runtime to be nvidia, please comment out `def
 
 **WARNING: YOU MUST EDIT DOCKERFILE SO THAT IT MATCHES YOUR HARDWARE REQUIREMENTS AND YOUR NEEDS.**
 
-The Dockerfile is more or less straightforward if you are familiar with how to write one. But in short, the image starts with `nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04`, git clones the repositories, and then buils in order of darknet, DarkHelp, and finally DarkMark. I intentially did multistage build so that I can refer to each stage. By multistage build, I meant there are 3 stages of the build in `Dockerfile`:
+The Dockerfile is more or less straightforward if you are familiar with how to write one. But in short, the image starts with `nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04`, git clones the repositories, and then buils in order of darknet, DarkHelp, and finally DarkMark. I intentially did multistage build so that I can refer to each stage. By multistage build, I meant there are 3 stages (darknet, DarkHelp, and DarkMark) of the build in `Dockerfile`:
 ```
 FROM nvidia/cuda:10.2-cudnn8-devel-ubuntu18.04 as darknet
 ...
@@ -67,7 +67,7 @@ FROM DarkHelp as DarkMark
 ```
 You cerrtainly do not have to do multistage build here (you do multistage build for either security reasons or reducing the image size), but I did it so that I can refer to them as I explain the file.
 
-Under `darknet` build stage, the Makefile must be editted. 
+Under `darknet` build stage, the Makefile must be editted and the following line does that job. 
 
 ```
 ############# EDIT darkent MAKEFILE #############
@@ -97,7 +97,7 @@ RUN sed -i '/arch=compute_75/s/^#//1' Makefile
 # Build
 Once you followed the above steps, one can build the image. Assuming you are under `DarkDocker`:
 ```
-docker build -t DarkDocker .
+docker build -t dark_docker .
 ```
 This should not take too long to build (on my desktop, around 16 min).
 
@@ -176,10 +176,10 @@ docker-compose up -d bash
 This will bring the `bash` service up in detached mode. To attach the docker terminal that just opened, run
 
 ```
-docker attach DarkDocker_bash
+docker attach darkdocker_bash_1
 ```
 
-When you run `docker-compose up`, the name of the image is set by name of the directory that docker-compose.yml resides in (in our case DarkDocker) + "_" + name of the service. Hence, we get `DarkDocker_bash`
+or you can run `docker ps` to inspect the name of the container and use that name to attach.
 
 At this point you should be in the terminal of the docker that you just ran and should be good to go! When you prompt
 
@@ -197,7 +197,7 @@ DarkHelp options_user_wants_to_throw
 ```
 ![darkhelp](./images/darkhelp.png)
 
-Happy object tracking!
+That's it! Happy object detection!
 
 # Sources
 1. https://github.com/AlexeyAB/darknet
